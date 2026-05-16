@@ -32,7 +32,7 @@ export default function Navbar() {
             {primeiroNome}
           </span>
           <img 
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" 
+           src={user?.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop"} 
             alt="Avatar Usuário" 
             className="w-8 h-8 rounded-full object-cover border border-zinc-800"
           />
