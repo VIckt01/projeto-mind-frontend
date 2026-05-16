@@ -141,37 +141,6 @@ export default function Login() {
           </p>
         </div>
       </main>
-
-      {/* FOOTER - IGUAL AO DO CADASTRO */}
-      <footer className="w-full bg-[#14181F] border-t border-zinc-800/60 py-[60px] px-[40px]">
-        <div className="w-full max-w-[1440px] mx-auto flex flex-col gap-[36px]">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-            <div className="flex flex-col max-w-xs">
-              <span className="text-xl font-bold tracking-tight text-white">&lt;M/&gt;</span>
-              <p className="text-zinc-500 text-xs mt-3 leading-relaxed">
-                Seu portal de tecnologia com artigos, tutoriais e novidades do mundo tech.
-              </p>
-            </div>
-            
-            <div className="flex gap-20">
-              <div className="flex flex-col gap-3">
-                <span className="font-bold text-white text-xs tracking-wide">Navegação</span>
-                <div className="flex flex-col gap-2.5 text-xs text-zinc-500">
-                  <a href="/" className="hover:text-white transition-colors">Home</a>
-                  <a href="/artigos" className="hover:text-white transition-colors">Artigos</a>
-                  <a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-zinc-800/80 w-full"></div>
-          <div className="text-center text-zinc-600 text-[11px] tracking-wide">
-            &copy; 2025 TechBlog. Todos os direitos reservados.
-          </div>
-        </div>
-      </footer>
-
     </div>
   );
 }
