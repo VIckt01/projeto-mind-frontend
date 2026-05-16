@@ -17,46 +17,29 @@ export default function EditarArtigo() {
   const { id } = useParams(); 
   const { user, loading } = useAuth();
 
-  // Estados para gerenciar os campos do formulário
+  // Estados do formulário
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [category, setCategory] = useState("Desenvolvimento web");
   const [content, setContent] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [tags, setTags] = useState<string[]>(["Typescript", "Backend", "IA"]);
+  const [currentTag, setCurrentTag] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
   
   const [fetching, setFetching] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lista com os mesmos artigos idênticos do seu Dashboard para servir de Fallback automático
+  // Mocks estruturados idênticos
   const mockArticles: Artigo[] = [
     { 
       id: 1, 
       title: "Desvendando o Aprendizado de Máquina: Do Conceito à Prática", 
       excerpt: "Entenda como os algoritmos de Machine Learning aprendem com dados e transformam indústrias inteiras.", 
-      content: "O Aprendizado de Máquina (Machine Learning) é um subcampo da Inteligência Artificial que permite a sistemas aprenderem padrões a partir de dados históricos para tomar decisões futuras sem serem explicitamente programados.",
-      imageUrl: "https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80"
-    },
-    { 
-      id: 2, 
-      title: "Construindo APIs Robustas e Escaláveis com Node.js e Express", 
-      excerpt: "As melhores práticas de mercado para architectar rotas, middlewares de proteção e conexões limpas.", 
-      content: "Arquitetar APIs escaláveis exige um entendimento profundo sobre middlewares, roteamento estruturado, tratamento centralizado de erros e segurança com tokens JWT.",
-      imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&auto=format&fit=crop&q=80"
-    },
-    { 
-      id: 3, 
-      title: "A Evolução da Inteligência Artificial nos Video Games Modernos", 
-      excerpt: "Como os comportamentos dos NPCs e a geração de mundos procedurais elevaram o nível dos jogos atuais.", 
-      content: "Os jogos modernos utilizam árvores de comportamento avançadas e redes neurais simples para fazer com que os inimigos e companheiros de equipe reajam de forma humana e contextual.",
-      imageUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&auto=format&fit=crop&q=80"
-    },
-    { 
-      id: 4, 
-      title: "Python para Automação: Economize Horas de Trabalho Manual", 
-      excerpt: "Aprenda a criar scripts simples em Python para ler planilhas, enviar emails e organizar arquivos.", 
-      content: "Automatizar tarefas repetitivas com Python é uma das habilidades mais valiosas atualmente. Usando bibliotecas como pandas e openpyxl, você reduz horas de digitação manual em segundos.",
-      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80"
-    },
+      content: "## O Futuro da Inteligência Artificial em 2025\n\nA inteligência artificial continua a evoluir em um ritmo acelerado. Neste artigo, vamos explorar as principais tendências e inovações que estão moldando o futuro da IA.",
+      imageUrl: "uploads/2026/01/Inteligencia_artigo_ia.png"
+    }
   ];
 
   useEffect(() => {
@@ -74,31 +57,20 @@ export default function EditarArtigo() {
           setTitle(data.title || "");
           setExcerpt(data.excerpt || "");
           setContent(data.content || data.body || "");
-          setImageUrl(data.imageUrl || "");
+          setCurrentImageUrl(data.imageUrl || "");
         } else {
-          // Se a API falhar ou não achar a rota, o front-end busca direto dos mesmos dados do Dashboard
-          const artigoEncontrado = mockArticles.find(art => art.id === Number(id));
-          if (artigoEncontrado) {
-            setTitle(artigoEncontrado.title);
-            setExcerpt(artigoEncontrado.excerpt || "");
-            setContent(artigoEncontrado.content || "");
-            setImageUrl(artigoEncontrado.imageUrl);
-          } else {
-            setError("Artigo não localizado nas referências locais.");
-          }
+          const localArt = mockArticles.find(art => art.id === Number(id)) || mockArticles[0];
+          setTitle(localArt.title);
+          setExcerpt(localArt.excerpt || "");
+          setContent(localArt.content || "");
+          setCurrentImageUrl(localArt.imageUrl);
         }
       } catch (err) {
-        console.error("Erro ao conectar ao banco, carregando fallback local...", err);
-        // Fallback reativo caso o servidor backend esteja totalmente desligado
-        const artigoEncontrado = mockArticles.find(art => art.id === Number(id));
-        if (artigoEncontrado) {
-          setTitle(artigoEncontrado.title);
-          setExcerpt(artigoEncontrado.excerpt || "");
-          setContent(artigoEncontrado.content || "");
-          setImageUrl(artigoEncontrado.imageUrl);
-        } else {
-          setError("Erro de comunicação com o servidor e artigo não encontrado localmente.");
-        }
+        const localArt = mockArticles.find(art => art.id === Number(id)) || mockArticles[0];
+        setTitle(localArt.title);
+        setExcerpt(localArt.excerpt || "");
+        setContent(localArt.content || "");
+        setCurrentImageUrl(localArt.imageUrl);
       } finally {
         setFetching(false);
       }
@@ -107,145 +79,172 @@ export default function EditarArtigo() {
     if (user) {
       fetchArtigoDados();
     }
-  }, [id, user, loading, router]);
+  }, [id, user, loading]);
+
+  // Cálculos dinâmicos de texto
+  const characterCount = content.length;
+  const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
+  const readingTime = Math.ceil(wordCount / 200);
+
+  const handleAddTag = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
+      setTags([...tags, currentTag.trim()]);
+      setCurrentTag("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
 
   const handleSalvarEdicao = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (characterCount > 8000) {
+      setError("O conteúdo do artigo excede o limite de 8000 caracteres.");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
     try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("excerpt", excerpt);
+      formData.append("category", category);
+      formData.append("content", content);
+      formData.append("tags", JSON.stringify(tags));
+      if (selectedFile) formData.append("banner", selectedFile);
+
       const response = await fetch(`http://localhost:5000/articles/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          excerpt,
-          content,
-          imageUrl,
-        }),
+        body: formData,
       });
 
-      if (response.ok) {
-        router.push("/dashboard");
-      } else {
-        // Mesmo sem persistir no banco local, simulamos o sucesso para fluxo fluido do teste front-end
-        alert("Artigo atualizado com sucesso (Modo de Demonstração Frontend)!");
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     } catch (err) {
-      console.error("Erro ao salvar atualizações:", err);
-      alert("Artigo atualizado com sucesso (Modo de Demonstração Frontend)!");
       router.push("/dashboard");
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading || fetching) {
-    return (
-      <div className="w-full min-h-screen bg-[#0B0E13] flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest animate-pulse">
-        Carregando dados do artigo...
-      </div>
-    );
-  }
+  if (loading || fetching) return <div className="min-h-screen bg-[#070a13] text-center pt-24 text-zinc-500 animate-pulse">Carregando dados...</div>;
 
   return (
-    <div className="w-full min-h-screen bg-[#0B0E13] text-white antialiased font-sans">
-      <main className="w-full max-w-2xl mx-auto px-6 py-12 flex flex-col gap-6">
+    <div className="w-full min-h-screen bg-[#070a13] text-white antialiased font-sans">
+      <main className="w-full max-w-3xl mx-auto px-4 py-12 flex flex-col">
         
-        {/* CABEÇALHO */}
-        <div className="flex flex-col gap-1 border-b border-zinc-900 pb-4">
-          <button
-            type="button"
-            onClick={() => router.push("/dashboard")}
-            className="text-xs text-zinc-500 hover:text-cyan-400 flex items-center gap-1.5 mb-2 transition-colors cursor-pointer w-max bg-transparent border-0"
-          >
-            &larr; Cancelar e voltar ao Dashboard
-          </button>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Editar Artigo</h1>
-          <p className="text-xs text-zinc-500">Atualize as informações, o conteúdo ou a imagem de capa da sua publicação.</p>
-        </div>
+        <button 
+          type="button" onClick={() => router.push("/dashboard")}
+          className="text-xs text-zinc-500 hover:text-cyan-400 flex items-center gap-1.5 mb-6 transition-colors border-0 bg-transparent cursor-pointer w-max"
+        >
+          &larr; Voltar ao Dashboard
+        </button>
 
-        {/* FEEDBACK DE ERRO SE HOUVER */}
-        {error && (
-          <div className="w-full bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-xs font-medium">
-            {error}
-          </div>
-        )}
+        <h1 className="text-2xl font-bold text-white tracking-tight">Editar Artigo</h1>
+        <p className="text-xs text-zinc-500 mt-1 mb-8">Atualize as informações do seu artigo</p>
 
-        {/* FORMULÁRIO DE EDIÇÃO */}
-        <form onSubmit={handleSalvarEdicao} className="w-full flex flex-col gap-5">
+        {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-xs mb-4">{error}</div>}
+
+        <form onSubmit={handleSalvarEdicao} className="w-full flex flex-col gap-6 bg-[#0d111e]/20 border border-zinc-900/60 p-6 rounded-xl">
           
-          {/* Título */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Título da Publicação</label>
-            <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: O Guia Definitivo de Inteligência Artificial..."
-              className="w-full bg-[#14181F] border border-zinc-900 focus:border-cyan-400 rounded-lg px-4 py-2.5 text-xs text-zinc-200 focus:outline-none transition-colors"
+            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Título do Artigo *</label>
+            <input 
+              type="text" required value={title} onChange={(e) => setTitle(e.target.value)}
+              className="w-full bg-[#14181F] border border-zinc-900 rounded-lg px-4 py-2.5 text-xs text-zinc-200 focus:outline-none focus:border-cyan-500/40"
             />
           </div>
 
-          {/* Resumo/Excerpt */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Breve Resumo (Excerpt)</label>
-            <input
-              type="text"
-              required
-              value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
-              placeholder="Uma linha que descreva o artigo na listagem..."
-              className="w-full bg-[#14181F] border border-zinc-900 focus:border-cyan-400 rounded-lg px-4 py-2.5 text-xs text-zinc-200 focus:outline-none transition-colors"
+            <div className="flex justify-between items-center">
+              <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Resumo *</label>
+              <span className="text-[10px] text-zinc-600 font-mono">{excerpt.length}/120</span>
+            </div>
+            <textarea 
+              required maxLength={120} value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2}
+              className="w-full bg-[#14181F] border border-zinc-900 rounded-lg px-4 py-2.5 text-xs text-zinc-200 focus:outline-none focus:border-cyan-500/40 resize-none"
             />
           </div>
 
-          {/* URL da Imagem de Capa */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">URL da Imagem de Capa</label>
-            <input
-              type="text"
-              required
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://images.unsplash.com/..."
-              className="w-full bg-[#14181F] border border-zinc-900 focus:border-cyan-400 rounded-lg px-4 py-2.5 text-xs text-zinc-200 focus:outline-none transition-colors"
-            />
-          </div>
-
-          {/* Conteúdo Completo */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Conteúdo do Artigo</label>
-            <textarea
-              rows={10}
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Escreva aqui o corpo completo do seu artigo..."
-              className="w-full bg-[#14181F] border border-zinc-900 focus:border-cyan-400 rounded-lg px-4 py-2.5 text-xs text-zinc-200 focus:outline-none resize-none leading-relaxed transition-colors"
-            />
-          </div>
-
-          {/* BOTÕES DE AÇÃO */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-900/60 mt-2">
-            <button
-              type="button"
-              onClick={() => router.push("/dashboard")}
-              className="px-4 py-2.5 bg-zinc-900/40 border border-zinc-800 text-zinc-400 hover:text-white rounded-lg text-xs font-semibold transition-all cursor-pointer"
+            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Categoria *</label>
+            <select value={category} onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-[#14181F] border border-zinc-900 rounded-lg px-3 py-2.5 text-xs text-zinc-400 focus:outline-none cursor-pointer"
             >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-md"
+              <option>Desenvolvimento web</option>
+              <option>Inteligência Artificial</option>
+              <option>DevOps</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Imagem de Capa *</label>
+            <div className="w-full flex items-center bg-[#14181F] border border-zinc-900 rounded-lg p-2 gap-3">
+              <label className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold px-4 py-2 rounded text-xs transition-colors cursor-pointer select-none">
+                Escolher ficheiro
+                <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+              </label>
+              <span className="text-xs text-zinc-500 truncate">
+                {selectedFile ? selectedFile.name : (currentImageUrl || "Nenhum ficheiro selecionado")}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Tags</label>
+            <div className="w-full flex gap-2">
+              <input 
+                type="text" value={currentTag} onChange={(e) => setCurrentTag(e.target.value)} placeholder="Adicionar tag..."
+                className="w-full bg-[#14181F] border border-zinc-900 rounded-lg px-4 py-2 text-xs text-zinc-200 focus:outline-none"
+              />
+              <button type="button" onClick={handleAddTag} className="bg-zinc-900 border border-zinc-800 px-4 text-xs font-bold text-zinc-300 rounded-lg hover:text-white transition-colors cursor-pointer">
+                Adicionar
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {tags.map((tag) => (
+                <span key={tag} className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 px-2 py-1 rounded">
+                  {tag}
+                  <button type="button" onClick={() => handleRemoveTag(tag)} className="text-zinc-600 hover:text-red-400 text-[9px] border-0 bg-transparent cursor-pointer font-bold">×</button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Conteúdo do Artigo *</label>
+            <textarea 
+              required value={content} onChange={(e) => setContent(e.target.value)} rows={12}
+              className="w-full bg-[#14181F] border border-zinc-900 rounded-lg px-4 py-3 text-xs text-zinc-200 focus:outline-none focus:border-cyan-500/40 font-mono leading-relaxed resize-none"
+            />
+            <div className="text-[10px] text-zinc-500 font-mono mt-1 flex flex-wrap gap-x-3 gap-y-1">
+              <span>{characterCount}/8000 caracteres</span>
+              <span>•</span>
+              <span>{wordCount} palavras</span>
+              <span>•</span>
+              <span>{readingTime} {readingTime === 1 ? "minuto" : "minutos"} de leitura</span>
+            </div>
+          </div>
+
+          <div className="w-full flex items-center justify-start gap-3 pt-6 border-t border-zinc-900 mt-4">
+            <button type="submit" disabled={submitting}
+              className="bg-cyan-400 hover:bg-cyan-300 text-zinc-950 font-bold px-6 py-2.5 rounded text-xs transition-all active:scale-[0.98] cursor-pointer"
             >
               {submitting ? "Salvando..." : "Salvar Alterações"}
+            </button>
+            <button type="button" onClick={() => router.push("/dashboard")}
+              className="bg-transparent text-zinc-500 hover:text-zinc-300 px-4 py-2.5 text-xs font-medium transition-colors cursor-pointer"
+            >
+              Cancelar
             </button>
           </div>
 
