@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  // stado para gerenciar a lista de leituras recentes de forma interativa
+  // Estado para gerenciar a lista de leituras recentes de forma interativa
   const [leituras, setLeituras] = useState<LeituraRecente[]>([
     {
       id: 1,
@@ -129,6 +129,23 @@ export default function Dashboard() {
         item.id === id ? { ...item, status: "Concluído" } : item
       )
     );
+  };
+
+  // Função reativa para deletar o artigo no Banco e atualizar o estado do Frontend
+  const handleDeletarArtigo = async (id: number) => {
+    const confirmar = confirm("Tem certeza que deseja excluir este artigo permanentemente?");
+    if (!confirmar) return;
+
+    try {
+      await fetch(`http://localhost:5000/articles/${id}`, {
+        method: "DELETE",
+      });
+
+      setArtigos((prev) => prev.filter((artigo) => artigo.id !== id));
+      setMetrics((prev) => ({ ...prev, totalArtigos: Math.max(0, prev.totalArtigos - 1) }));
+    } catch (err) {
+      console.error("Erro ao deletar artigo", err);
+    }
   };
 
   if (loading || fetching) {
@@ -269,6 +286,7 @@ export default function Dashboard() {
                       Editar
                     </button>
                     <button 
+                      onClick={() => handleDeletarArtigo(artigo.id)}
                       className="flex-1 sm:w-20 flex items-center justify-center gap-1.5 px-2.5 py-1.5 border border-red-950/20 bg-red-500/5 hover:bg-red-500/10 text-[11px] text-red-400 font-semibold rounded transition-all cursor-pointer"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3 text-red-500/70">
