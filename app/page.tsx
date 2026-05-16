@@ -1,11 +1,11 @@
 import React from "react";
-import Link from "next/link"; // ◄— Importado para navegação nativa e performática de Server Components
+import Link from "next/link"; // Importado para navegação nativa e performática de Server Components
 
 // --- TIPAGEM E INTERFACES ---
 type ArticleAPI = {
   id: number;
   title: string;
-  slug: string; // ◄— Adicionado para receber o link dinâmico do banco
+  slug: string; // Adicionado para receber o link dinâmico do banco
   content: string;
   banner: { type: string; data: number[] } | null;
   createdAt: string;
@@ -15,7 +15,7 @@ type ArticleAPI = {
 interface DisplayArticle {
   id: number;
   title: string;
-  slug: string; // ◄— Adicionado para o redirecionamento
+  slug: string; // Adicionado para o redirecionamento
   content: string;
   date: string;
   author: string;
@@ -79,7 +79,7 @@ export default async function Home() {
     {
       id: 1,
       title: "Construindo Aplicações Ultrarápidas com Next.js e React Server Components",
-      slug: "construindo-aplicacoes-ultrarapidas-com-nextjs", // ◄— Adicionado slug coerente
+      slug: "construindo-aplicacoes-ultrarapidas-com-nextjs", // Adicionado slug coerente
       content: "Descubra como otimizar o tempo de carregamento e a experiência do usuário utilizando as novas arquiteturas de renderização do ecossistema React.",
       date: "14 de Mai de 2026",
       author: "Guilherme Santos",
@@ -92,7 +92,7 @@ export default async function Home() {
     {
       id: 2,
       title: "O Guia Definitivo de Inteligência Artificial para Desenvolvedores Web",
-      slug: "o-guia-definitivo-de-inteligencia-artificial", // ◄— Adicionado slug coerente
+      slug: "o-guia-definitivo-de-inteligencia-artificial", // Adicionado slug coerente
       content: "A IA não vai substituir você, mas quem usa IA vai. Saiba como integrar modelos de linguagem diretamente na sua interface de forma prática e escalável.",
       date: "10 de Mai de 2026",
       author: "Beatriz Ribeiro",
