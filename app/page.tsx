@@ -1,9 +1,11 @@
 import React from "react";
+import Link from "next/link"; // ◄— Importado para navegação nativa e performática de Server Components
 
 // --- TIPAGEM E INTERFACES ---
 type ArticleAPI = {
   id: number;
   title: string;
+  slug: string; // ◄— Adicionado para receber o link dinâmico do banco
   content: string;
   banner: { type: string; data: number[] } | null;
   createdAt: string;
@@ -13,6 +15,7 @@ type ArticleAPI = {
 interface DisplayArticle {
   id: number;
   title: string;
+  slug: string; // ◄— Adicionado para o redirecionamento
   content: string;
   date: string;
   author: string;
@@ -47,6 +50,7 @@ async function getArticles(): Promise<DisplayArticle[]> {
     return data.map((art) => ({
       id: art.id,
       title: art.title,
+      slug: art.slug, // ◄— Mapeado diretamente do retorno da API
       content: art.content,
       date: new Date(art.createdAt).toLocaleDateString("pt-BR", {
         day: "2-digit",
@@ -75,6 +79,7 @@ export default async function Home() {
     {
       id: 1,
       title: "Construindo Aplicações Ultrarápidas com Next.js e React Server Components",
+      slug: "construindo-aplicacoes-ultrarapidas-com-nextjs", // ◄— Adicionado slug coerente
       content: "Descubra como otimizar o tempo de carregamento e a experiência do usuário utilizando as novas arquiteturas de renderização do ecossistema React.",
       date: "14 de Mai de 2026",
       author: "Guilherme Santos",
@@ -87,6 +92,7 @@ export default async function Home() {
     {
       id: 2,
       title: "O Guia Definitivo de Inteligência Artificial para Desenvolvedores Web",
+      slug: "o-guia-definitivo-de-inteligencia-artificial", // ◄— Adicionado slug coerente
       content: "A IA não vai substituir você, mas quem usa IA vai. Saiba como integrar modelos de linguagem diretamente na sua interface de forma prática e escalável.",
       date: "10 de Mai de 2026",
       author: "Beatriz Ribeiro",
@@ -99,6 +105,7 @@ export default async function Home() {
     {
       id: 3,
       title: "Transição de Carreira para DevOps: Por Onde Começar em 2026?",
+      slug: "transicao-de-carreira-para-devops-por-onde-comecar", // ◄— Adicionado slug coerente
       content: "Se você quer dominar pipelines de CI/CD, Docker, Kubernetes e infraestrutura como código, este roteiro prático vai acelerar sua jornada.",
       date: "04 de Mai de 2026",
       author: "Lucas Andrade",
@@ -214,7 +221,7 @@ export default async function Home() {
         <div className="w-full max-w-5xl px-4 flex flex-col items-center text-center">
           <h3 className="text-2xl font-bold text-white tracking-tight">Quer fazer parte do ecossistema?</h3>
           <p className="mt-3 text-zinc-400 text-sm max-w-lg leading-relaxed">
-            Escreveu um artigo massa ou resolveu um problema complexo na sua squad? Compartilhe com a nossa comunidade tech.
+            Escreveu um artigo massa ou resolveu um problem complexo na sua squad? Compartilhe com a nossa comunidade tech.
           </p>
           <button className="mt-8 bg-cyan-400 text-zinc-950 font-bold px-6 py-3 rounded-lg text-xs tracking-wider uppercase hover:bg-cyan-300 active:scale-[0.98] transition-all shadow-lg shadow-cyan-500/5 cursor-pointer">
             Criar Minha Conta Gratuita
@@ -229,12 +236,16 @@ export default async function Home() {
 function ArticleCard({ article, showBanner }: { article: DisplayArticle; showBanner: boolean }) {
   const authorInitials = article.author ? article.author.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "??";
 
+  // Modificado de <article> para <Link> para criar a navegação dinâmica perfeita por slug de Server Components
   return (
-    <article className="bg-[#0f1322] border border-zinc-900/80 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-800 hover:scale-[1.015] transition-all duration-300 cursor-pointer w-full shadow-md hover:shadow-cyan-950/20">
+    <Link 
+      href={`/artigos/${article.slug}`}
+      className="bg-[#0f1322] border border-zinc-900/80 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-800 hover:scale-[1.015] transition-all duration-300 cursor-pointer w-full shadow-md hover:shadow-cyan-950/20"
+    >
       
       {/* Seção do Banner Inteligente */}
       {showBanner && (
-        <div className="h-44 relative flex items-center justify-center overflow-hidden select-none border-b border-zinc-900/60 bg-[#070a13]">
+        <div className="h-44 relative flex items-center justify-center overflow-hidden select-none border-b border-zinc-900/60 bg-[#070a13] w-full">
           {article.bannerSrc ? (
             // Se houver imagem convertida real do backend
             <img 
@@ -257,7 +268,7 @@ function ArticleCard({ article, showBanner }: { article: DisplayArticle; showBan
         </div>
       )}
       
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-5 flex flex-col flex-1 w-full">
         <div className="flex items-center justify-between text-[10px] font-medium">
           <span className="bg-zinc-900 text-cyan-400 border border-zinc-800 px-2 py-0.5 rounded-md font-semibold tracking-wide">
             {article.category}
@@ -273,7 +284,7 @@ function ArticleCard({ article, showBanner }: { article: DisplayArticle; showBan
           {article.content}
         </p>
         
-        <div className="mt-5 pt-3.5 border-t border-zinc-900 flex items-center justify-between text-[11px] text-zinc-500">
+        <div className="mt-5 pt-3.5 border-t border-zinc-900 flex items-center justify-between text-[11px] text-zinc-500 w-full">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 bg-gradient-to-tr from-zinc-800 to-zinc-700 rounded-full flex items-center justify-center text-[9px] font-bold text-zinc-300 border border-zinc-700/60 shadow-inner">
               {authorInitials}
@@ -290,6 +301,6 @@ function ArticleCard({ article, showBanner }: { article: DisplayArticle; showBan
           )}
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
