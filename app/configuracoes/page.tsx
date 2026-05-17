@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../services/api";
+import { api } from "../../services/api";
 
 export default function Configuracoes() {
   const router = useRouter();

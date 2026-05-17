@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
-import { api } from "../../services/api";
+import { api } from "../../../services/api";
 export default function EditarArtigo() {
   const router = useRouter();
   const { id } = useParams();
