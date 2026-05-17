@@ -3,18 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
-
-interface Artigo {
-  id: number;
-  title: string;
-  excerpt?: string;
-  content?: string;
-  imageUrl: string;
-}
-
+import { api } from "../../../services/api";
 export default function EditarArtigo() {
   const router = useRouter();
-  const { id } = useParams(); 
+  const { id } = useParams();
   const { user, loading } = useAuth();
 
   // Estados do formulário
@@ -24,23 +16,13 @@ export default function EditarArtigo() {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>(["Typescript", "Backend", "IA"]);
   const [currentTag, setCurrentTag] = useState("");
+  
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [currentImageUrl, setCurrentImageUrl] = useState("");
   
   const [fetching, setFetching] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Mocks estruturados idênticos
-  const mockArticles: Artigo[] = [
-    { 
-      id: 1, 
-      title: "Desvendando o Aprendizado de Máquina: Do Conceito à Prática", 
-      excerpt: "Entenda como os algoritmos de Machine Learning aprendem com dados e transformam indústrias inteiras.", 
-      content: "## O Futuro da Inteligência Artificial em 2025\n\nA inteligência artificial continua a evoluir em um ritmo acelerado. Neste artigo, vamos explorar as principais tendências e inovações que estão moldando o futuro da IA.",
-      imageUrl: "uploads/2026/01/Inteligencia_artigo_ia.png"
-    }
-  ];
 
   useEffect(() => {
     if (!loading && !user) {
@@ -51,26 +33,20 @@ export default function EditarArtigo() {
     const fetchArtigoDados = async () => {
       if (!id) return;
       try {
-        const response = await fetch(`http://localhost:5000/articles/${id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setTitle(data.title || "");
-          setExcerpt(data.excerpt || "");
-          setContent(data.content || data.body || "");
-          setCurrentImageUrl(data.imageUrl || "");
-        } else {
-          const localArt = mockArticles.find(art => art.id === Number(id)) || mockArticles[0];
-          setTitle(localArt.title);
-          setExcerpt(localArt.excerpt || "");
-          setContent(localArt.content || "");
-          setCurrentImageUrl(localArt.imageUrl);
-        }
-      } catch (err) {
-        const localArt = mockArticles.find(art => art.id === Number(id)) || mockArticles[0];
-        setTitle(localArt.title);
-        setExcerpt(localArt.excerpt || "");
-        setContent(localArt.content || "");
-        setCurrentImageUrl(localArt.imageUrl);
+        // Busca os dados REAIS do artigo pelo ID via Axios
+        const response = await api.get(`/article/${id}`);
+        const data = response.data;
+        
+        // Preenche os estados com as informações que vieram do banco
+        setTitle(data.title || "");
+        setExcerpt(data.excerpt || "");
+        setContent(data.content || "");
+        // O Service formata a imagem binária na chave 'banner'
+        setCurrentImageUrl(data.banner || ""); 
+        
+      } catch (err: any) {
+        console.error("Erro ao buscar dados do artigo", err);
+        setError("Não foi possível carregar os dados deste artigo.");
       } finally {
         setFetching(false);
       }
@@ -79,7 +55,7 @@ export default function EditarArtigo() {
     if (user) {
       fetchArtigoDados();
     }
-  }, [id, user, loading]);
+  }, [id, user, loading, router]);
 
   // Cálculos dinâmicos de texto
   const characterCount = content.length;
@@ -121,16 +97,24 @@ export default function EditarArtigo() {
       formData.append("category", category);
       formData.append("content", content);
       formData.append("tags", JSON.stringify(tags));
-      if (selectedFile) formData.append("banner", selectedFile);
+      
+      // Só adiciona o arquivo se o usuário subiu uma NOVA imagem. E a chave é "file" para o Multer
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
 
-      const response = await fetch(`http://localhost:5000/articles/${id}`, {
-        method: "PUT",
-        body: formData,
+      // Faz o envio (PUT) usando a nossa api (já envia o token autenticado para validar se é o dono)
+      await api.put(`/article/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
       });
 
       router.push("/dashboard");
-    } catch (err) {
-      router.push("/dashboard");
+    } catch (err: any) {
+      console.error(err);
+      // Pega o erro do backend (ex: "Acesso negado: Você só pode editar os seus próprios artigos.")
+      setError(err.response?.data?.error || "Erro ao salvar edições.");
     } finally {
       setSubmitting(false);
     }
@@ -193,10 +177,14 @@ export default function EditarArtigo() {
                 Escolher ficheiro
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
-              <span className="text-xs text-zinc-500 truncate">
-                {selectedFile ? selectedFile.name : (currentImageUrl || "Nenhum ficheiro selecionado")}
+              <span className="text-xs text-zinc-500 truncate max-w-[200px] sm:max-w-xs block">
+                {selectedFile ? selectedFile.name : (currentImageUrl ? "Imagem atual selecionada" : "Nenhum ficheiro selecionado")}
               </span>
             </div>
+            {/* Opcional: Mostrar preview da imagem atual se existir */}
+            {currentImageUrl && !selectedFile && (
+              <img src={currentImageUrl} alt="Capa atual" className="w-24 h-16 object-cover rounded mt-2 border border-zinc-800" />
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -237,7 +225,7 @@ export default function EditarArtigo() {
 
           <div className="w-full flex items-center justify-start gap-3 pt-6 border-t border-zinc-900 mt-4">
             <button type="submit" disabled={submitting}
-              className="bg-cyan-400 hover:bg-cyan-300 text-zinc-950 font-bold px-6 py-2.5 rounded text-xs transition-all active:scale-[0.98] cursor-pointer"
+              className="bg-cyan-400 hover:bg-cyan-300 text-zinc-950 font-bold px-6 py-2.5 rounded text-xs transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               {submitting ? "Salvando..." : "Salvar Alterações"}
             </button>
