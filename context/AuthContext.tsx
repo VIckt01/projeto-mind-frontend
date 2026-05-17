@@ -1,20 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { api } from "../services/api";
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  avatarUrl?: string;
+  profileImg?: string;
   bio?: string;
   role?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
+  loginState: (userData: User) => void; // Apenas seta o state
   logout: () => void;
   loading: boolean;
 }
@@ -25,53 +26,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem("techblog_auth");
-    
-    if (storedAuth) {
-      const { user, expiresAt } = JSON.parse(storedAuth);
+    const hydrateSession = async () => {
+      // Verifica se o cookie 'session' existe
+      const hasSessionCookie = document.cookie.includes("session=");
 
-      // SISTEMA DE EXPIRAÇÃO: Se o tempo atual passou do prazo, desloga
-      if (Date.now() > expiresAt) {
-        logout();
-      } else {
-        setUser(user);
+      if (!hasSessionCookie) {
+        setLoading(false);
+        return;
       }
-    }
-    setLoading(false);
+
+      try {
+        // Se tem cookie, busca os dados reais e atualizados do usuário
+        const response = await api.get("/auth/me");
+        setUser(response.data.data);
+      } catch (error) {
+        console.error("Sessão inválida. Limpando...");
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    hydrateSession();
   }, []);
 
-  // PROTEÇÃO DE ROTAS: Se o usuário não estiver logado e tentar acessar rotas restritas
-  useEffect(() => {
-    const rotasRestritas = ["/dashboard", "/novo-artigo", "/editar-artigo"];
-    
-    if (!loading && !user && rotasRestritas.includes(pathname)) {
-      router.push("/"); // Chuta o usuário de volta para a Home se a sessão expirar
-    }
-  }, [user, pathname, loading]);
-
-  const login = (userData: User) => {
-    // Define que a sessão vai expirar em 40 dias a partir de agora
-   const dias = 40;
-    const tempoExpiracao = Date.now() + (dias * 24 * 60 * 60 * 1000); 
-    
-    localStorage.setItem(
-      "techblog_auth",
-      JSON.stringify({ user: userData, expiresAt: tempoExpiracao })
-    );
+  // Método usado na tela de login apenas para salvar o usuário em memória
+  const loginState = (userData: User) => {
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("techblog_auth");
+    // Deleta o cookie setando a data de expiração para o passado
+    document.cookie =
+      "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     setUser(null);
     router.push("/");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loginState, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
