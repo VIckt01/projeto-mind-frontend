@@ -1,5 +1,7 @@
 "use server";
 
+import { IComment } from "../comment/comment.client";
+
 // Tipagem exata do retorno do backend
 export interface ArticleDetailResponse {
   id: string;
@@ -16,6 +18,7 @@ export interface ArticleDetailResponse {
     name: string;
     profileImg: string | null;
   };
+  comments: IComment[];
 }
 
 export async function getArticleBySlugServer(
@@ -24,10 +27,10 @@ export async function getArticleBySlugServer(
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    // O Next.js fará o fetch no servidor (SSR).
-    const response = await fetch(`${apiUrl}/article/${slug}`, {
+    // CORREÇÃO: Batendo no caminho exato isolado por slug (/article/slug/:slug)
+    const response = await fetch(`${apiUrl}/article/slug/${slug}`, {
       method: "GET",
-      cache: "no-store", // Garante que trará os dados mais frescos
+      cache: "no-store",
     });
 
     if (!response.ok) {

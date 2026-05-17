@@ -3,18 +3,14 @@ import Link from "next/link";
 import { getArticleBySlugServer } from "@/services/article/detail.server";
 import ArticleContent from "../../../components/article/articleDetails/ArticleContent";
 import ArticleHeader from "../../../components/article/articleDetails/ArticleHeader";
-import CommentsSection from "../../../components/article/articleDetails/CommentsSection";
+import CommentsSection from "@/components/article/articleDetails/CommentsSection";
 
-// 1. Tipamos o params como uma Promise
 export default async function DetalheArtigoPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  // 2. Extraímos o slug fazendo o await no params!
   const { slug } = await params;
-
-  // 3. Agora sim a string real vai para o servidor
   const article = await getArticleBySlugServer(slug);
 
   if (!article) {
@@ -38,14 +34,13 @@ export default async function DetalheArtigoPage({
           &larr; Voltar aos Artigos
         </Link>
 
-        {/* Componente: Cabeçalho com Título, Autor, Curtidas e Salvar */}
         <ArticleHeader article={article} />
-
-        {/* Componente: Imagem e Corpo do Texto */}
         <ArticleContent article={article} />
 
-        {/* Componente: Comentários (Visual Estático) */}
-        <CommentsSection />
+        <CommentsSection 
+          articleId={article.id} 
+          initialComments={article.comments || []} 
+        />
       </div>
     </div>
   );

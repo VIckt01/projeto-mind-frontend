@@ -14,7 +14,7 @@ interface ArticleHeaderProps {
 }
 
 export default function ArticleHeader({ article }: ArticleHeaderProps) {
-  // Estados visuais apenas (como o backend ainda não tem essas features, mantemos a UI reativa)
+  
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likesCount, setLikesCount] = useState(article.likes);

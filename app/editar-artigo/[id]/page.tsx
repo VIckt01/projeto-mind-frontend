@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import { api } from "../../../services/api";
+
 export default function EditarArtigo() {
   const router = useRouter();
   const { id } = useParams();
@@ -33,19 +34,20 @@ export default function EditarArtigo() {
     const fetchArtigoDados = async () => {
       if (!id) return;
       try {
-        // Busca os dados REAIS do artigo pelo ID via Axios
-        const response = await api.get(`/article/${id}`);
+        setFetching(true);
+        setError(null);
+        
+        const response = await api.get(`/article/id/${id}`);
         const data = response.data;
 
         // Preenche os estados com as informações que vieram do banco
         setTitle(data.title || "");
         setExcerpt(data.excerpt || "");
         setContent(data.content || "");
-        // O Service formata a imagem binária na chave 'banner'
         setCurrentImageUrl(data.banner || "");
       } catch (err: any) {
-        console.error("Erro ao buscar dados do artigo", err);
-        setError("Não foi possível carregar os dados deste artigo.");
+        console.error("Erro ao buscar dados do artigo:", err);
+        setError(err.response?.data?.error || "Não foi possível carregar os dados deste artigo.");
       } finally {
         setFetching(false);
       }
@@ -58,8 +60,7 @@ export default function EditarArtigo() {
 
   // Cálculos dinâmicos de texto
   const characterCount = content.length;
-  const wordCount =
-    content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
+  const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
   const readingTime = Math.ceil(wordCount / 200);
 
   const handleAddTag = (e: React.FormEvent) => {
@@ -98,12 +99,10 @@ export default function EditarArtigo() {
       formData.append("content", content);
       formData.append("tags", JSON.stringify(tags));
 
-      // Só adiciona o arquivo se o usuário subiu uma NOVA imagem. E a chave é "file" para o Multer
       if (selectedFile) {
         formData.append("file", selectedFile);
       }
 
-      // Faz o envio (PUT) usando a nossa api (já envia o token autenticado para validar se é o dono)
       await api.put(`/article/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -113,7 +112,6 @@ export default function EditarArtigo() {
       router.push("/dashboard");
     } catch (err: any) {
       console.error(err);
-      // Pega o erro do backend (ex: "Acesso negado: Você só pode editar os seus próprios artigos.")
       setError(err.response?.data?.error || "Erro ao salvar edições.");
     } finally {
       setSubmitting(false);
@@ -224,7 +222,6 @@ export default function EditarArtigo() {
                     : "Nenhum ficheiro selecionado"}
               </span>
             </div>
-            {/* Opcional: Mostrar preview da imagem atual se existir */}
             {currentImageUrl && !selectedFile && (
               <img
                 src={currentImageUrl}
@@ -290,8 +287,7 @@ export default function EditarArtigo() {
               <span>{wordCount} palavras</span>
               <span>•</span>
               <span>
-                {readingTime} {readingTime === 1 ? "minuto" : "minutos"} de
-                leitura
+                {readingTime} {readingTime === 1 ? "minuto" : "minutos"} de leitura
               </span>
             </div>
           </div>

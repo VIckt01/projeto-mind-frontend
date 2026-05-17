@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import DashboardHeader from "./DashboardHeader";
 import MyArticles from "./MyArticles";
-import DeleteModal from "./DeleteModal";
 import Metrics from "./Metrics";
 import SidebarPlaceholders from "./SidebarPlaceholders";
+import DeleteModal from "../ui/DeleteModal";
 
 interface Artigo {
   id: string;
@@ -29,7 +29,6 @@ export default function DashboardClient({
 }) {
   const router = useRouter();
 
-  // Formatando os dados vindos do servidor
   const [artigos, setArtigos] = useState<Artigo[]>(
     initialArticles.map((art: any) => ({
       id: String(art.id),
@@ -56,12 +55,9 @@ export default function DashboardClient({
     if (!articleToDelete) return;
 
     try {
-      // O seu interceptor do Axios vai injetar o token "session" automaticamente aqui
       await api.delete(`/article/${articleToDelete}`);
-
-      // Remove da UI imediatamente sem precisar dar F5
       setArtigos((prev) => prev.filter((a) => a.id !== articleToDelete));
-      router.refresh(); // Força o Next.js a atualizar os dados do servidor silenciosamente em background
+      router.refresh();
     } catch (e) {
       console.error("Erro ao deletar o artigo:", e);
     } finally {
@@ -74,6 +70,8 @@ export default function DashboardClient({
     <>
       {isDeleteModalOpen && (
         <DeleteModal
+          title="Excluir Artigo?"
+          description="Esta ação é permanente. O artigo vai ser apagado de todas as secções."
           onCancel={() => setIsDeleteModalOpen(false)}
           onConfirm={executeDelete}
         />
