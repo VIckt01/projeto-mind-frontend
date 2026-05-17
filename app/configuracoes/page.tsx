@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../../services/api";
+import { api } from "../services/api";
 
 export default function Configuracoes() {
   const router = useRouter();
@@ -99,7 +99,7 @@ export default function Configuracoes() {
 
       setSuccess("Configurações atualizadas com sucesso!");
 
-      // ◄— Atualiza o estado da aplicação com os novos dados recebidos do backend
+      // Atualiza o estado da aplicação com os novos dados recebidos do backend
       if (response.data && response.data.data) {
         loginState(response.data.data);
       }

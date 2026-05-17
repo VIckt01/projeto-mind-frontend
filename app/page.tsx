@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import { api } from "../services/api";
+import { api } from "./services/api";
 
 interface DisplayArticle {
   id: string;
@@ -23,36 +23,28 @@ interface DisplayArticle {
 export const MOCK_ARTICLES = [
   {
     id: "mock-1",
-    title:
-      "Construindo Aplicações Ultrarápidas com Next.js e React Server Components",
+    title: "Construindo Aplicações Ultrarápidas com Next.js e React Server Components",
     slug: "construindo-aplicacoes-ultrarapidas-com-nextjs",
-    content:
-      "Descubra como otimizar o tempo de carregamento e a experiência do usuário utilizando as novas arquiteturas de renderização do ecossistema React. \n\n## Server Components\nEles permitem renderizar componentes no servidor, reduzindo o bundle JavaScript enviado ao cliente.",
-    excerpt:
-      "Descubra como otimizar o tempo de carregamento e a experiência do usuário utilizando as novas arquiteturas de renderização.",
+    content: "Descubra como otimizar o tempo de carregamento e a experiência do usuário utilizando as novas arquiteturas de renderização do ecossistema React. \n\n## Server Components\nEles permitem renderizar componentes no servidor, reduzindo o bundle JavaScript enviado ao cliente.",
+    excerpt: "Descubra como otimizar o tempo de carregamento e a experiência do usuário utilizando as novas arquiteturas de renderização.",
     createdAt: "2026-05-14T10:00:00.000Z",
     author: { name: "Guilherme Santos", profileImg: "" },
     category: "Desenvolvimento web",
-    banner:
-      "https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=80",
     views: 12400,
     likes: 182,
     tags: '["Next.js", "React", "Performance"]',
   },
   {
     id: "mock-2",
-    title:
-      "O Guia Definitivo de Inteligência Artificial para Desenvolvedores Web",
+    title: "O Guia Definitivo de Inteligência Artificial para Desenvolvedores Web",
     slug: "o-guia-definitivo-de-inteligencia-artificial",
-    content:
-      "A IA não vai substituir você, mas quem usa IA vai. Saiba como integrar modelos de linguagem diretamente na sua interface de forma prática e escalável.\n\n## Integração com APIs\nUtilizar APIs da OpenAI ou Anthropic ficou mais fácil do que nunca.",
-    excerpt:
-      "A IA não vai substituir você, mas quem usa IA vai. Saiba como integrar modelos de linguagem na sua interface.",
+    content: "A IA não vai substituir você, mas quem usa IA vai. Saiba como integrar modelos de linguagem diretamente na sua interface de forma prática e escalável.\n\n## Integração com APIs\nUtilizar APIs da OpenAI ou Anthropic ficou mais fácil do que nunca.",
+    excerpt: "A IA não vai substituir você, mas quem usa IA vai. Saiba como integrar modelos de linguagem na sua interface.",
     createdAt: "2026-05-10T10:00:00.000Z",
     author: { name: "Beatriz Ribeiro", profileImg: "" },
     category: "Inteligência Artificial",
-    banner:
-      "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&auto=format&fit=crop&q=80",
     views: 8100,
     likes: 94,
     tags: '["IA", "Web", "Inovação"]',
@@ -61,15 +53,12 @@ export const MOCK_ARTICLES = [
     id: "mock-3",
     title: "Transição de Carreira para DevOps: Por Onde Começar em 2026?",
     slug: "transicao-de-carreira-para-devops-por-onde-comecar",
-    content:
-      "Se você quer dominar pipelines de CI/CD, Docker, Kubernetes e infraestrutura como código, este roteiro prático vai acelerar sua jornada.\n\n## O que estudar?\nComece por Linux, Redes e Git. Depois avance para Docker e CI/CD.",
-    excerpt:
-      "Se você quer dominar pipelines de CI/CD e infraestrutura como código, este roteiro vai acelerar sua jornada.",
+    content: "Se você quer dominar pipelines de CI/CD, Docker, Kubernetes e infraestrutura como código, este roteiro prático vai acelerar sua jornada.\n\n## O que estudar?\nComece por Linux, Redes e Git. Depois avance para Docker e CI/CD.",
+    excerpt: "Se você quer dominar pipelines de CI/CD e infraestrutura como código, este roteiro vai acelerar sua jornada.",
     createdAt: "2026-05-04T10:00:00.000Z",
     author: { name: "Lucas Andrade", profileImg: "" },
     category: "DevOps",
-    banner:
-      "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=800&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=800&auto=format&fit=crop&q=80",
     views: 15200,
     likes: 322,
     tags: '["DevOps", "Carreira", "Cloud"]',
@@ -78,42 +67,63 @@ export const MOCK_ARTICLES = [
     id: "mock-4",
     title: "Python para Automação: Economize Horas de Trabalho Manual",
     slug: "python-para-automacao",
-    content:
-      "Aprenda a criar scripts simples em Python para ler planilhas, enviar emails e organizar arquivos.\n\n## Bibliotecas Essenciais\nPandas para dados, OS para arquivos e SMTPlib para emails.",
-    excerpt:
-      "Aprenda a criar scripts simples em Python para ler planilhas, enviar emails e organizar arquivos rapidamente.",
+    content: "Aprenda a criar scripts simples em Python para ler planilhas, enviar emails e organizar arquivos.\n\n## Bibliotecas Essenciais\nPandas para dados, OS para arquivos e SMTPlib para emails.",
+    excerpt: "Aprenda a criar scripts simples em Python para ler planilhas, enviar emails e organizar arquivos rapidamente.",
     createdAt: "2026-05-01T10:00:00.000Z",
     author: { name: "Fernanda Costa", profileImg: "" },
     category: "Desenvolvimento web",
-    banner:
-      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80",
     views: 5400,
     likes: 120,
     tags: '["Python", "Automação", "Produtividade"]',
   },
 ];
 
-export const mapMockArticle = (art: any): DisplayArticle => ({
-  id: art.id,
-  title: art.title,
-  slug: art.slug,
-  content: art.excerpt || art.content,
-  date: new Date(art.createdAt).toLocaleDateString("pt-BR"),
-  author: art.author?.name || "Autor Anônimo",
-  category: art.category || "Tecnologia",
-  bannerSrc: art.banner,
-  views: art.views || 0,
-  likes: art.likes || 0,
-  comments: 0,
-});
+export const mapMockArticle = (art: any): DisplayArticle => {
+  const savedComments = typeof window !== 'undefined' ? localStorage.getItem(`techblog_comments_${art.id}`) : null;
+  const commentsCount = savedComments ? JSON.parse(savedComments).length : 0;
+
+  return {
+    id: String(art.id),
+    title: art.title,
+    slug: art.slug,
+    content: art.excerpt || art.content,
+    date: new Date(art.createdAt).toLocaleDateString("pt-BR"),
+    author: art.author?.name || "Autor Anônimo",
+    category: art.category || "Tecnologia",
+    bannerSrc: art.banner || art.imageUrl || "https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80",
+    views: art.views || 0,
+    likes: art.likes || 0,
+    comments: commentsCount,
+  };
+};
+
+export function SavedIcon({ articleId, userId }: { articleId: string; userId?: string }) {
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      const isSaved = localStorage.getItem(`techblog_save_${userId}_${articleId}`);
+      setSaved(isSaved === "true");
+    }
+  }, [articleId, userId]);
+
+  if (!saved) return null;
+
+  return (
+    <span title="Artigo Salvo" className="inline-block align-text-bottom mr-1.5 text-cyan-400">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 inline">
+        <path fillRule="evenodd" d="M6.32 2.577a4.901 4.901 0 0 1 5.68-.89l.328.168.327-.168a4.901 4.901 0 0 1 5.68.89c.642.642 1.053 1.503 1.168 2.457L19.5 21l-7.5-4.5L4.5 21l-.003-15.966a3.523 3.523 0 0 1 1.168-2.457Z" clipRule="evenodd" />
+      </svg>
+    </span>
+  );
+}
 
 export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [featuredArticles, setFeaturedArticles] = useState<DisplayArticle[]>(
-    [],
-  );
+  const [featuredArticles, setFeaturedArticles] = useState<DisplayArticle[]>([]);
   const [recentArticles, setRecentArticles] = useState<DisplayArticle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -122,31 +132,19 @@ export default function Home() {
       try {
         const response = await api.get("/article/feed/highlights");
         const { destaques, recentes } = response.data;
+        
+        let finalDestaques = destaques.length > 0 ? destaques : [...MOCK_ARTICLES].sort((a, b) => b.views - a.views).slice(0, 4);
+        let finalRecentes = recentes.length > 0 ? recentes : [...MOCK_ARTICLES].slice(0, 4);
 
-        if (destaques.length === 0 && recentes.length === 0)
-          throw new Error("Banco vazio");
-
-        setFeaturedArticles(destaques.map(mapMockArticle));
-        setRecentArticles(recentes.map(mapMockArticle));
+        setFeaturedArticles(finalDestaques.map(mapMockArticle));
+        setRecentArticles(finalRecentes.map(mapMockArticle));
       } catch (error) {
-        // FALLBACK PARA MOCKS SE O BANCO ESTIVER VAZIO OU API FALHAR
-        const sortedDestaques = [...MOCK_ARTICLES]
-          .sort((a, b) => b.views + b.likes - (a.views + a.likes))
-          .slice(0, 4);
-        const sortedRecentes = [...MOCK_ARTICLES]
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-          )
-          .slice(0, 4);
-
-        setFeaturedArticles(sortedDestaques.map(mapMockArticle));
-        setRecentArticles(sortedRecentes.map(mapMockArticle));
+        setFeaturedArticles([...MOCK_ARTICLES].sort((a, b) => b.views - a.views).slice(0, 4).map(mapMockArticle));
+        setRecentArticles([...MOCK_ARTICLES].slice(0, 4).map(mapMockArticle));
       } finally {
         setLoading(false);
       }
     }
-
     fetchHomeData();
   }, []);
 
@@ -159,7 +157,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center flex-1 bg-[#070a13] text-zinc-100 antialiased font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="w-full flex flex-col items-center flex-1 bg-[#070a13] text-zinc-100 antialiased font-sans">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.08),transparent_50%)] pointer-events-none" />
 
       <div className="w-full max-w-5xl px-4 flex flex-col z-10">
@@ -170,81 +168,40 @@ export default function Home() {
               Tecnologia
             </span>
           </h1>
-          <p className="mt-6 text-zinc-400 text-sm md:text-base max-w-md leading-relaxed">
-            Artigos aprofundados sobre engenharia de software, inteligência
-            artificial e as reais tendências do mercado tech.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-3.5 w-full max-w-md justify-center">
-            <button
-              onClick={() => router.push("/artigos")}
-              className="w-full sm:w-auto px-8 bg-cyan-400 text-zinc-950 font-bold py-3.5 rounded-lg text-xs tracking-wider uppercase hover:bg-cyan-300 active:scale-[0.98] transition-all shadow-lg cursor-pointer"
-            >
+          <p className="mt-6 text-zinc-400 text-sm max-w-md">Artigos aprofundados sobre engenharia de software e inteligência artificial.</p>
+          <div className="mt-10 flex gap-3.5 w-full max-w-md justify-center">
+            <button onClick={() => router.push("/artigos")} className="px-8 bg-cyan-400 text-zinc-950 font-bold py-3.5 rounded-lg text-xs tracking-wider uppercase transition-all shadow-lg cursor-pointer">
               Explorar Artigos
             </button>
-            <button
-              onClick={handleStartWriting}
-              className="w-full sm:w-auto px-8 border border-zinc-800 bg-[#0f1322]/60 text-zinc-300 font-semibold py-3.5 rounded-lg text-xs tracking-wider uppercase hover:bg-zinc-800/80 hover:text-white active:scale-[0.98] transition-all cursor-pointer"
-            >
+            <button onClick={() => router.push(user ? "/criar-artigo" : "/login")} className="px-8 border border-zinc-800 bg-[#0f1322]/60 text-zinc-300 font-semibold py-3.5 rounded-lg text-xs tracking-wider uppercase transition-all cursor-pointer hover:bg-zinc-800">
               Começar a Escrever
             </button>
           </div>
         </section>
 
-        {loading ? (
-          <div className="text-center py-20 text-zinc-500 animate-pulse font-mono text-xs">
-            Carregando artigos...
-          </div>
-        ) : (
+        {!loading && (
           <>
             <section className="w-full mb-28">
               <div className="flex items-end justify-between w-full mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
-                    Artigos em Destaque
-                  </h2>
-                  <p className="text-xs text-zinc-500 mt-1">
-                    Os conteúdos mais relevantes selecionados para você
-                  </p>
+                  <h2 className="text-2xl font-bold text-white tracking-tight">Artigos em Destaque</h2>
                 </div>
-                <Link
-                  href="/artigos"
-                  className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold group transition-colors"
-                >
-                  Ver todos{" "}
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    &rarr;
-                  </span>
-                </Link>
+                <Link href="/artigos" className="text-xs text-cyan-400 font-semibold">&rarr; Ver todos</Link>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                 {featuredArticles.map((article) => (
-                  <ArticleCard
-                    key={`destaque-${article.id}`}
-                    article={article}
-                    showBanner={true}
-                  />
+                  <ArticleCard key={article.id} article={article} showBanner={true} userId={user?.id} />
                 ))}
               </div>
             </section>
 
             <section className="w-full mb-28">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  Artigos Recentes
-                </h2>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Atualizações frescas vindas diretamente da comunidade
-                </p>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Artigos Recentes</h2>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 {recentArticles.map((article) => (
-                  <ArticleCard
-                    key={`recente-${article.id}`}
-                    article={article}
-                    showBanner={false}
-                  />
+                  <ArticleCard key={article.id} article={article} showBanner={false} userId={user?.id} />
                 ))}
               </div>
             </section>
@@ -255,70 +212,21 @@ export default function Home() {
   );
 }
 
-function ArticleCard({
-  article,
-  showBanner,
-}: {
-  article: DisplayArticle;
-  showBanner: boolean;
-}) {
-  const authorInitials = article.author
-    ? article.author
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "U";
-
+function ArticleCard({ article, showBanner, userId }: { article: DisplayArticle; showBanner: boolean; userId?: string; }) {
   return (
-    <Link
-      href={`/artigos/${article.slug}`}
-      className="bg-[#0f1322] border border-zinc-900/80 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-800 hover:scale-[1.015] transition-all duration-300 w-full shadow-md"
-    >
+    <Link href={`/artigos/${article.slug}`} className="bg-[#0f1322] border border-zinc-900/80 rounded-xl overflow-hidden flex flex-col group transition-all w-full shadow-md hover:border-zinc-800">
       {showBanner && (
-        <div className="h-32 relative flex items-center justify-center overflow-hidden select-none border-b border-zinc-900/60 bg-[#070a13] w-full">
-          {article.bannerSrc ? (
-            <img
-              src={article.bannerSrc}
-              alt={article.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-75 group-hover:brightness-100"
-              loading="lazy"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-zinc-900" />
-          )}
+        <div className="h-32 bg-[#070a13] w-full">
+          <img src={article.bannerSrc || ""} alt={article.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
         </div>
       )}
       <div className="p-4 flex flex-col flex-1 w-full">
-        <div className="flex items-center justify-between text-[10px] font-medium mb-1">
-          <span className="bg-zinc-900 text-cyan-400 border border-zinc-800 px-2 py-0.5 rounded-md font-semibold tracking-wide">
-            {article.category}
-          </span>
-          <span className="text-zinc-500">{article.date}</span>
-        </div>
-        <h3 className="text-sm font-bold mt-2 text-zinc-100 group-hover:text-cyan-400 transition-colors line-clamp-2 leading-snug tracking-tight">
+        <span className="text-[10px] text-cyan-400 font-semibold mb-2">{article.category}</span>
+        <h3 className="text-sm font-bold text-zinc-100 group-hover:text-cyan-400 transition-colors line-clamp-2 leading-snug">
+          <SavedIcon articleId={article.id} userId={userId} />
           {article.title}
         </h3>
-        <p className="text-zinc-400 text-[11px] mt-2 line-clamp-2 flex-1 leading-relaxed">
-          {article.content}
-        </p>
-        <div className="mt-4 pt-3 border-t border-zinc-900 flex items-center justify-between text-[10px] text-zinc-500 w-full">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-gradient-to-tr from-zinc-800 to-zinc-700 rounded-full flex items-center justify-center text-[9px] font-bold text-zinc-300 border border-zinc-700/60 shadow-inner">
-              {authorInitials}
-            </div>
-            <span className="text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors truncate max-w-[80px]">
-              {article.author}
-            </span>
-          </div>
-          {showBanner && (
-            <div className="flex items-center gap-2 font-mono text-zinc-500/70">
-              <span>👁️ {article.views}</span>
-              <span>❤️ {article.likes}</span>
-            </div>
-          )}
-        </div>
+        <p className="text-zinc-400 text-[11px] mt-2 line-clamp-2">{article.content}</p>
       </div>
     </Link>
   );
