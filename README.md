@@ -17,7 +17,7 @@ Aplicação interativa desenvolvida em Next.js com design moderno, responsivo e 
 - **Formulário de Postagens:** Interface limpa para a criação e edição completa de artigos.
 - **Configurações:** Tela intuitiva para atualização de biografia e upload da foto de perfil.
 
-## 🖼️ Demonstração Visual (Screenshots)
+## 🖼️ Demonstração Visual
 <img width="1254" height="804" alt="image" src="https://github.com/user-attachments/assets/32e66a51-8cf4-47b7-9c18-2f5eead7e6b1" />
 <img width="1218" height="618" alt="image" src="https://github.com/user-attachments/assets/f4d52ca6-159c-4d52-95c3-59715f8f60e5" />
 <img width="1342" height="820" alt="image" src="https://github.com/user-attachments/assets/afa2983d-9199-4369-9ea4-3b5c991b3b11" />
