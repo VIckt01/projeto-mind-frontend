@@ -15,9 +15,9 @@ export default async function DetalheArtigoPage({
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-[#070a13] flex flex-col items-center pt-32 text-zinc-500 font-mono text-sm">
+      <div className="min-h-screen bg-[#070a13] flex flex-col items-center pt-32 text-zinc-500 text-sm">
         <p>Artigo não encontrado.</p>
-        <Link href="/artigos" className="text-cyan-400 mt-4 hover:underline">
+        <Link href="/artigos" className="text-cyan-400 mt-4 hover:underline transition-all">
           &larr; Voltar aos artigos
         </Link>
       </div>
@@ -26,21 +26,23 @@ export default async function DetalheArtigoPage({
 
   return (
     <div className="w-full min-h-screen bg-[#070a13] text-zinc-100 antialiased font-sans flex flex-col items-center">
-      <div className="w-full max-w-3xl px-6 py-12 flex flex-col">
+      <div className="w-full max-w-[768px] px-6 py-10 flex flex-col">
+        
+        {/* Botão Voltar */}
         <Link
           href="/artigos"
-          className="text-xs text-zinc-500 hover:text-cyan-400 mb-8 inline-block w-max transition-colors"
+          className="flex items-center gap-2 text-xs text-zinc-400 hover:text-white mb-10 w-max transition-colors"
         >
-          &larr; Voltar aos Artigos
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Voltar aos Artigos
         </Link>
 
+        {/* Componentes da Página */}
         <ArticleHeader article={article} />
         <ArticleContent article={article} />
-
-        <CommentsSection 
-          articleId={article.id} 
-          initialComments={article.comments || []} 
-        />
+        <CommentsSection articleId={article.id} initialComments={article.comments || []} />
       </div>
     </div>
   );

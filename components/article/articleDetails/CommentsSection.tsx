@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link"; // Adicionado para o botão de login
 import { useAuth } from "@/context/AuthContext";
 import { IComment } from "@/services/comment/comment.client";
 import CommentForm from "./CommentForm";
@@ -12,10 +13,10 @@ interface CommentsSectionProps {
 }
 
 export default function CommentsSection({ articleId, initialComments }: CommentsSectionProps) {
-  const { user } = useAuth(); // Pega o usuário logado do seu contexto
+  const { user } = useAuth();
   const [comments, setComments] = useState<IComment[]>(initialComments);
 
-  // Funções para manter o estado local sincronizado com a API sem recarregar a tela
+  // Mantém o estado local sincronizado com a API sem recarregar a tela
   const handleCommentCreated = (newComment: IComment) => {
     setComments((prev) => [newComment, ...prev]);
   };
@@ -31,24 +32,28 @@ export default function CommentsSection({ articleId, initialComments }: Comments
   };
 
   return (
-    <section className="border-t border-zinc-900 pt-6 mt-10">
-      <h2 className="text-xs font-bold text-white mb-5 flex items-center gap-2">
-        Comentários
-        <span className="bg-zinc-900 text-zinc-500 px-2 py-0.5 rounded-full font-mono text-[10px]">
-          {comments.length}
-        </span>
-      </h2>
+    <section className="w-full border-t border-zinc-800/60 pt-10 mt-10">
+      {/* Título idêntico ao design */}
+      <h3 className="text-xs font-bold text-zinc-300 mb-6">
+        Comentários ({comments.length})
+      </h3>
 
-      {/* Só exibe o formulário de criar se o usuário estiver logado */}
+      {/* Condicional de Login */}
       {user ? (
         <CommentForm articleId={articleId} onCommentCreated={handleCommentCreated} />
       ) : (
-        <div className="bg-[#0f1322] border border-zinc-900 p-4 rounded-xl text-center text-xs text-zinc-500 mb-8">
-          Faça login para deixar um comentário neste artigo.
+        <div className="w-full border border-zinc-800/60 bg-[#0a0d17] p-10 rounded flex flex-col items-center justify-center gap-4 mb-8">
+          <span className="text-xs text-zinc-500">Faça login para comentar</span>
+          <Link 
+            href="/login" 
+            className="bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-6 py-2 rounded text-xs font-bold transition-colors cursor-pointer"
+          >
+            Fazer login
+          </Link>
         </div>
       )}
 
-      {/* Mapeando a lista de comentários */}
+      {/* Lista de Comentários */}
       <div className="flex flex-col gap-4">
         {comments.length === 0 ? (
           <div className="text-center py-8 text-zinc-600 text-xs">
@@ -59,7 +64,7 @@ export default function CommentsSection({ articleId, initialComments }: Comments
             <CommentItem
               key={comment.id}
               comment={comment}
-              currentUserId={user?.id} // Passa o ID do usuário logado para validar permissões
+              currentUserId={user?.id}
               onUpdate={handleCommentUpdated}
               onDelete={handleCommentDeleted}
             />

@@ -37,6 +37,7 @@ export default function EditarArtigo() {
         setFetching(true);
         setError(null);
         
+ 
         const response = await api.get(`/article/id/${id}`);
         const data = response.data;
 
@@ -103,6 +104,7 @@ export default function EditarArtigo() {
         formData.append("file", selectedFile);
       }
 
+      // Envia as alterações para a rota privada por ID (/article/:id)
       await api.put(`/article/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",

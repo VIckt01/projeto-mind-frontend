@@ -1,27 +1,35 @@
 import React from "react";
+import { FiFileText, FiMessageSquare, FiHeart, FiTrendingUp } from "react-icons/fi";
 
-export default function Metrics() {
+interface MetricsProps {
+  total: number;
+  engajamento: number;
+  curtidas: number;
+  tempoMedio: number;
+}
+
+export default function Metrics({ total, engajamento, curtidas, tempoMedio }: MetricsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-      <div className="bg-[#14181F] border border-zinc-900 rounded-xl p-5 flex flex-col justify-between h-28">
-        <span className="text-zinc-500 font-bold text-[11px]">
-          Total de Artigos
-        </span>
-        <span className="text-3xl font-bold">12</span>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="bg-transparent border border-zinc-800/80 rounded-lg p-5 flex flex-col justify-between h-28 relative">
+        <FiFileText className="text-zinc-600 absolute top-5 right-5" size={18} />
+        <span className="text-zinc-500 text-xs">Total de Artigos</span>
+        <span className="text-3xl font-light text-white">{total}</span>
       </div>
-      <div className="bg-[#14181F] border border-zinc-900 rounded-xl p-5 flex flex-col justify-between h-28">
-        <span className="text-zinc-500 font-bold text-[11px]">Engajamento</span>
-        <span className="text-3xl font-bold">340</span>
+      <div className="bg-transparent border border-zinc-800/80 rounded-lg p-5 flex flex-col justify-between h-28 relative">
+        <FiMessageSquare className="text-zinc-600 absolute top-5 right-5" size={18} />
+        <span className="text-zinc-500 text-xs">Engajamento</span>
+        <span className="text-3xl font-light text-white">{engajamento}</span>
       </div>
-      <div className="bg-[#14181F] border border-zinc-900 rounded-xl p-5 flex flex-col justify-between h-28">
-        <span className="text-zinc-500 font-bold text-[11px]">Curtidas</span>
-        <span className="text-3xl font-bold">150</span>
+      <div className="bg-transparent border border-zinc-800/80 rounded-lg p-5 flex flex-col justify-between h-28 relative">
+        <FiHeart className="text-zinc-600 absolute top-5 right-5" size={18} />
+        <span className="text-zinc-500 text-xs">Curtidas</span>
+        <span className="text-3xl font-light text-white">{curtidas}</span>
       </div>
-      <div className="bg-[#14181F] border border-zinc-900 rounded-xl p-5 flex flex-col justify-between h-28">
-        <span className="text-zinc-500 font-bold text-[11px]">
-          Tempo de Leitura
-        </span>
-        <span className="text-3xl font-bold">45 min</span>
+      <div className="bg-transparent border border-zinc-800/80 rounded-lg p-5 flex flex-col justify-between h-28 relative">
+        <FiTrendingUp className="text-zinc-600 absolute top-5 right-5" size={18} />
+        <span className="text-zinc-500 text-xs">Tempo médio de leitura</span>
+        <span className="text-3xl font-light text-white">{tempoMedio} <span className="text-lg">min</span></span>
       </div>
     </div>
   );

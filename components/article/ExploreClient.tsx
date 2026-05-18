@@ -1,206 +1,97 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import Link from "next/link";
-import { BsBookmarkFill, BsGridFill, BsListUl } from "react-icons/bs";
-import { ExploreArticleResponse } from "@/services/article/explore.server";
+import React, { useState } from "react";
+import ArticleCard from "../home/ArticleCard";
 
 interface ExploreClientProps {
-  initialArticles: ExploreArticleResponse[];
+  initialArticles: any[];
 }
 
 export default function ExploreClient({ initialArticles }: ExploreClientProps) {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Todos");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list"); // ← Por padrão, visualização em lista
 
-  // Ordena os destaques (4 melhores) somando views e likes no próprio frontend
-  const destaques = useMemo(() => {
-    return [...initialArticles]
-      .sort((a, b) => b.views + b.likes - (a.views + a.likes))
-      .slice(0, 4);
-  }, [initialArticles]);
-
-  // Filtra de acordo com o texto digitado e a categoria selecionada
-  const filteredArticles = useMemo(() => {
-    return initialArticles.filter((art) => {
-      const artCategory = art.category || "Desenvolvimento web"; // Fallback caso backend não tenha category
-
-      const matchesSearch = art.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        selectedCategory === "Todos" || artCategory === selectedCategory;
-
-      return matchesSearch && matchesCategory;
-    });
-  }, [initialArticles, searchQuery, selectedCategory]);
+  // Aplica os filtros digitados/selecionados pelo usuário
+  const filteredArticles = initialArticles.filter((article) => {
+    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = category ? article.category === category : true;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div className="w-full max-w-5xl px-4 py-12 flex flex-col">
-      <header className="mb-10 flex justify-between items-end border-b border-zinc-900 pb-6">
-        <div>
-          <Link
-            href="/"
-            className="text-xs text-zinc-500 hover:text-cyan-400 flex items-center gap-1.5 mb-2 transition-colors w-max"
-          >
-            &larr; Voltar para a Home
-          </Link>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Explore Artigos
-          </h1>
-        </div>
-      </header>
+    <main className="w-full max-w-[1200px] mx-auto px-6 pt-16 flex flex-col">
+      
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Todos os Artigos</h1>
+        <p className="text-zinc-400 text-sm">Explore nossa coleção completa de artigos técnicos</p>
+      </div>
 
-      {destaques.length > 0 && (
-        <div className="mb-14">
-          <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-5 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />{" "}
-            Em Destaque
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-            {destaques.map((art) => (
-              <Link
-                href={`/artigos/${art.slug}`}
-                key={`highlight-${art.id}`}
-                className="bg-[#14181F] border border-zinc-900 rounded-xl overflow-hidden group flex flex-col shadow-lg"
-              >
-                <div className="h-32 bg-zinc-900 relative">
-                  <img
-                    src={art.banner || ""}
-                    alt={art.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 filter brightness-75 group-hover:brightness-100"
-                  />
-                </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <span className="text-[9px] text-cyan-400 font-semibold mb-1 uppercase">
-                    {art.category || "Desenvolvimento web"}
-                  </span>
-                  <h3 className="text-xs font-bold text-white group-hover:text-cyan-400 line-clamp-2 leading-snug">
-                    <BsBookmarkFill
-                      className="text-cyan-400 inline mb-0.5 mr-1"
-                      size={10}
-                    />
-                    {art.title}
-                  </h3>
-                </div>
-              </Link>
-            ))}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-10">
+        {/* Campo de Pesquisa */}
+        <div className="relative w-full md:max-w-md">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Buscar artigos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-[#0d111e]/60 border border-zinc-800/80 rounded-lg pl-10 pr-4 py-2.5 text-xs text-zinc-200 focus:outline-none focus:border-cyan-500/50 transition-colors placeholder:text-zinc-600"
+          />
+        </div>
+
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          {/* Dropdown de Categorias */}
+          <div className="relative flex-1 md:flex-none">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full md:w-48 bg-[#0d111e]/60 border border-zinc-800/80 rounded-lg pl-9 pr-4 py-2.5 text-xs text-zinc-400 appearance-none focus:outline-none focus:border-cyan-500/50 cursor-pointer"
+            >
+              <option value="">Desenvolvimento web</option>
+              <option value="IA">Inteligência Artificial</option>
+              <option value="DevOps">DevOps</option>
+            </select>
+            <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
-        </div>
-      )}
 
-      {/* CONTROLES DE FILTRO E BUSCA */}
-      <div className="w-full flex flex-col sm:flex-row gap-4 items-center justify-between mb-8">
-        <input
-          type="text"
-          placeholder="Buscar artigos..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:max-w-xs bg-[#0d111e]/60 border border-zinc-900 rounded-lg px-4 py-2 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500/50"
-        />
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-[#0d111e]/60 border border-zinc-900 rounded-lg px-3 py-2 text-xs text-zinc-400 focus:outline-none cursor-pointer"
-          >
-            <option value="Todos">Todos os artigos</option>
-            <option value="Desenvolvimento web">Desenvolvimento web</option>
-            <option value="Inteligência Artificial">
-              Inteligência Artificial
-            </option>
-            <option value="DevOps">DevOps</option>
-          </select>
-
-          <div className="flex items-center bg-[#0d111e] border border-zinc-900 p-0.5 rounded-lg">
+          {/* Botões Grid / Lista */}
+          <div className="flex items-center gap-1.5 border border-zinc-800/80 rounded-lg p-1 bg-[#0d111e]/40">
             <button
               onClick={() => setViewMode("grid")}
-              title="Visualização em Grid"
-              className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === "grid" ? "bg-zinc-800 text-cyan-400" : "text-zinc-500"}`}
+              className={`p-1.5 rounded transition-colors cursor-pointer ${viewMode === "grid" ? "bg-orange-400 text-zinc-950" : "text-zinc-500 hover:text-zinc-300"}`}
             >
-              <BsGridFill size={14} />
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
             </button>
             <button
               onClick={() => setViewMode("list")}
-              title="Visualização em Lista"
-              className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === "list" ? "bg-zinc-800 text-cyan-400" : "text-zinc-500"}`}
+              className={`p-1.5 rounded transition-colors cursor-pointer ${viewMode === "list" ? "bg-orange-400 text-zinc-950" : "text-zinc-500 hover:text-zinc-300"}`}
             >
-              <BsListUl size={14} />
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>
             </button>
           </div>
         </div>
       </div>
 
-      {/* LISTAGEM DE ARTIGOS */}
-      {filteredArticles.length === 0 ? (
-        <div className="text-center py-12 text-zinc-500 text-sm">
-          Nenhum artigo encontrado.
-        </div>
-      ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      {/* Renderização do Grid ou Lista */}
+      {filteredArticles.length > 0 ? (
+        <div className={`grid gap-5 w-full ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
           {filteredArticles.map((article) => (
-            <Link
-              href={`/artigos/${article.slug}`}
-              key={`grid-${article.id}`}
-              className="bg-[#0f1322] border border-zinc-900 rounded-xl overflow-hidden flex flex-col group transition-all duration-200"
-            >
-              <div className="h-44 bg-zinc-900 relative flex items-center justify-center overflow-hidden select-none">
-                <img
-                  src={article.banner || ""}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-75 group-hover:brightness-100"
-                />
-              </div>
-              <div className="p-5 flex flex-col flex-1">
-                <span className="bg-zinc-900 text-cyan-400 font-medium px-2 py-0.5 rounded border border-zinc-800 w-max text-[10px]">
-                  {article.category || "Desenvolvimento web"}
-                </span>
-                <h3 className="text-base font-bold mt-4 text-white group-hover:text-cyan-400 transition-colors line-clamp-2">
-                  <BsBookmarkFill
-                    className="text-cyan-400 inline mb-0.5 mr-1.5"
-                    size={12}
-                  />
-                  {article.title}
-                </h3>
-              </div>
-            </Link>
+            <ArticleCard key={article.id} article={article} showBanner={true} viewMode={viewMode} />
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-4 w-full">
-          {filteredArticles.map((article) => (
-            <Link
-              href={`/artigos/${article.slug}`}
-              key={`list-${article.id}`}
-              className="bg-[#0f1322] border border-zinc-900/60 rounded-xl p-4 flex flex-col sm:flex-row gap-5 items-start sm:items-center group transition-all"
-            >
-              <div className="w-full sm:w-48 h-28 bg-zinc-900 relative flex items-center justify-center overflow-hidden rounded-lg shrink-0 select-none">
-                <img
-                  src={article.banner || ""}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-75 group-hover:brightness-100"
-                />
-              </div>
-              <div className="flex flex-col flex-1 gap-1">
-                <span className="text-[10px] text-cyan-400 font-semibold uppercase">
-                  {article.category || "Desenvolvimento web"}
-                </span>
-                <h3 className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors line-clamp-1">
-                  <BsBookmarkFill
-                    className="text-cyan-400 inline mb-0.5 mr-1.5"
-                    size={12}
-                  />
-                  {article.title}
-                </h3>
-                <p className="text-zinc-500 text-xs line-clamp-2 mt-1">
-                  {article.excerpt}
-                </p>
-              </div>
-            </Link>
-          ))}
+        <div className="text-center py-20 text-zinc-500 text-sm border border-dashed border-zinc-800 rounded-xl">
+          Nenhum artigo encontrado.
         </div>
       )}
-    </div>
+    </main>
   );
 }
