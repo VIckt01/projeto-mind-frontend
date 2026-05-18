@@ -30,6 +30,23 @@ Aplicação interativa desenvolvida em Next.js com design moderno, responsivo e 
 ---
 
 ## 📦 Como Rodar o Projeto
+
 1. Instale as dependências:
+
    ```bash
    npm install
+
+   ```
+
+2. Configurar a .env com a url da API
+
+   ```bash
+    NEXT_PUBLIC_API_URL='url da sua api'
+
+   ```
+
+ 3. Para rodar o projeto use
+
+    ```bash
+    npm run dev
+    ```
